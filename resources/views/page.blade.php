@@ -14,7 +14,8 @@
         padding:20px;
         font-family:Helvetica, Arial;
         color:{{ $font_color }};
-        backgroud: {{ $bg }};
+        background-image: linear-gradient(to right, blue, red);
+        
     }
     .profileImage img {
       width: auto;
