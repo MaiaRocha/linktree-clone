@@ -11,7 +11,6 @@ use App\Models\Link;
 
 class AdminController extends Controller
 {
-
     public function __construct() {
         $this->middleware('auth',['except' => [
             'login',
@@ -97,6 +96,55 @@ class AdminController extends Controller
             } else {
                 return redirect('/admin');
             }
+    }
+
+    public function linkOrderUpdate($linkid, $pos) {
+
+        $user = Auth::user();
+        $link = Link::find($linkid);
+
+        $myPages = [];
+        $myPagesQuery = Page::where('id_user', $user->id)->get();
+        foreach($myPagesQuery as $pageItem) {
+            $myPages[] = $pageItem->id;
+        }
+
+        if(in_array($link->id_page, $myPages)) {
+            if($link->order . $pos) {
+                //subiu o item
+                //jogando os prox p baixo
+                $afterLinks = Link::where('id_page', $link->id_page)
+                    ->where('order', '>=', $pos)
+                    ->get();
+                foreach($afterLinks as $afterLink) {
+                    $afterLink->order++;
+                    $afterLink->save();
+                }
+
+            } elseif($link->order < $pos) {
+               //desceu o item
+               //jogando os anteriores pra cima
+               $beforeLinks = Link::where('id_page', $link->id_page)
+                ->where('order', '<=', $pos)
+                ->get();
+                foreach($beforeLinks as $beforeLink) {
+                    $beforeLink->order--;
+                    $beforeLink->save();
+                }
+            }
+            //posicionando o item 
+            $link->order = $pos;
+            $link->save();
+            //corrigindo as posições
+            $allLinks = Link::where('id_page', $link->id_page)
+                ->orderBy('order', 'ASC')
+                ->get();
+            foreach($allLinks as $linkKey => $linkItem) {
+                $linkItem->order = $linkKey;
+                $linkItem->save();
+            }
+        }  
+        return [];
     }
 
     public function pageDesign($slug) {
