@@ -2,7 +2,7 @@
 
 @section('body')
 
-<a class="bigbutton" href="{{url('/admin/'.$page->slug.'/newLink')}}" >Novo Link</a>
+<a class="bigbutton" href="{{url('/admin/'.$page->slug.'/newlink')}}" >Novo Link</a>
 
 <ul id="links">
     @foreach($links as $link) 
